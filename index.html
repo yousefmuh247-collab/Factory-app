@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ps" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>د فابریکې حساب کتاب</title>
+<meta name="theme-color" content="#1e3a5f">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏭</text></svg>">
+<style>
+  :root {
+    --primary: #1e3a5f;
+    --primary-2: #2c3e50;
+    --accent: #f1c40f;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --info: #2980b9;
+    --bg: #f4f6f8;
+    --card: #ffffff;
+    --text: #222;
+    --border: #ddd;
+  }
+  * { box-sizing: border-box; font-family: Tahoma, 'Segoe UI', Arial, sans-serif; }
+  body { margin:0; background: var(--bg); color: var(--text); -webkit-tap-highlight-color: transparent; }
+
+  /* Header */
+  header {
+    background: var(--primary); color: white;
+    padding: 12px 15px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  }
+  header h1 { margin:0; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+  .user-bar { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+  .user-bar button {
+    padding: 7px 12px; border: none; border-radius: 6px; cursor: pointer;
+    font-weight: bold; font-size: 13px; transition: all 0.2s;
+  }
+  .btn-green { background: var(--success); color: white; }
+  .btn-red { background: var(--danger); color: white; }
+  .btn-blue { background: var(--info); color: white; }
+  .btn-green:hover, .btn-red:hover, .btn-blue:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  /* Nav */
+  nav { display: flex; flex-wrap: wrap; background: var(--primary-2); overflow-x: auto; }
+  nav button {
+    flex: 1; min-width: 100px; padding: 12px 10px;
+    border: none; background: none; color: white; cursor: pointer;
+    font-size: 13px; border-bottom: 3px solid transparent;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  nav button:hover { background: #34495e; }
+  nav button.active { background: #34495e; border-bottom-color: var(--accent); font-weight: bold; }
+
+  /* Main */
+  main { padding: 15px; max-width: 1200px; margin: auto; padding-bottom: 60px; }
+  .page { display: none; animation: fadeIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: none; } }
+
+  /* Card */
+  .card {
+    background: var(--card); border-radius: 12px; padding: 18px;
+    margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid #eaeaea;
+  }
+  .card h3 { margin: 0 0 15px; color: var(--primary); font-size: 16px; display: flex; align-items: center; gap: 8px; }
+
+  /* Grid form */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .grid input, .grid select, .grid textarea {
+    width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; transition: border 0.2s;
+  }
+  .grid input:focus, .grid select:focus { outline: none; border-color: var(--info); }
+  .grid button {
+    padding: 10px; background: var(--info); color: white; border: none;
+    border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px;
+    transition: all 0.2s;
+  }
+  .grid button:hover { background: #1c5980; transform: translateY(-1px); }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; min-width: 500px; }
+  th, td { border: 1px solid var(--border); padding: 9px 8px; text-align: right; }
+  th { background: #ecf0f1; color: var(--primary); font-weight: bold; position: sticky; top: 0; }
+  tr:nth-child(even) { background: #fafbfc; }
+  tr:hover { background: #f0f8ff; }
+  .delete-btn {
+    background: var(--danger); color: white; border: none;
+    padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;
+  }
+  .delete-btn:hover { background: #c0392b; }
+
+  /* Stats */
+  .stat {
+    background: linear-gradient(135deg, #ecf0f1, #dfe6e9);
+    padding: 18px; border-radius: 10px; text-align: center;
+    transition: transform 0.2s;
+  }
+  .stat:hover { transform: translateY(-2px); }
+  .stat span { font-size: 13px; color: #555; }
+  .stat b { display: block; font-size: 22px; color: var(--primary); margin-top: 6px; }
+  .stat.green b { color: var(--success); }
+  .stat.red b { color: var(--danger); }
+
+  /* Login */
+  .login-bg {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2c3e50 100%);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .login-box {
+    width: 100%; max-width: 380px; background: white;
+    padding: 30px; border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: slideUp 0.4s ease;
+  }
+  @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: none; } }
+  .login-box h2 { text-align: center; color: var(--primary); margin: 0 0 5px; font-size: 22px; }
+  .login-box p.sub { text-align: center; color: #888; font-size: 13px; margin: 0 0 20px; }
+  .login-box input {
+    width: 100%; padding: 12px; margin: 8px 0;
+    border: 1px solid var(--border); border-radius: 8px; font-size: 14px;
+  }
+  .login-box input:focus { outline: none; border-color: var(--info); }
+  .login-box button {
+    width: 100%; padding: 12px; background: var(--info); color: white;
+    border: none; border-radius: 8px; cursor: pointer;
+    font-weight: bold; margin-top: 10px; font-size: 15px;
+    transition: all 0.2s;
+  }
+  .login-box button:hover { background: #1c5980; }
+  .error { color: var(--danger); text-align: center; margin-top: 8px; font-size: 13px; min-height: 18px; }
+  .hint {
+    font-size: 12px; color: #888; text-align: center;
+    margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px;
+  }
+
+  /* Empty */
+  .empty { text-align: center; padding: 30px; color: #999; font-size: 14px; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--success); color: white; padding: 12px 24px; border-radius: 8px;
+    font-weight: bold; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transition: transform 0.3s; z-index: 999;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--danger); }
+
+  @media (max-width: 600px) {
+    nav button { min-width: 80px; font-size: 11px; padding: 10px 6px; }
+    header h1 { font-size: 15px; }
+    .stat b { font-size: 18px; }
+    main { padding: 10px; }
+    .card { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== لاګین ===== -->
+<div id="loginView" class="login-bg">
+  <div class="login-box">
+    <h2>🏭 د فابریکې حساب کتاب</h2>
+    <p class="sub">خپل حسابونه په اسانۍ اداره کړه</p>
+    <input type="text" id="lgUser" placeholder="کارن نوم" autocomplete="username">
+    <input type="password" id="lgPass" placeholder="پاسورډ" autocomplete="current-password">
+    <button onclick="doLogin()">ننوتل</button>
+    <div class="error" id="lgErr"></div>
+    <div class="hint">
+      لومړی ځل: <b>admin</b> / <b>admin123</b>
+    </div>
+  </div>
+</div>
+
+<!-- ===== اپ ===== -->
+<div id="appView" style="display:none">
+  <header>
+    <h1>🏭 د فابریکې حساب کتاب</h1>
+    <div class="user-bar">
+      <span id="currentUser"></span>
+      <button class="btn-green" id="usersBtn" onclick="showPage('users', document.querySelector('nav button[data-p=users]'))" style="display:none">👥 کاروونکي</button>
+      <button class="btn-blue" onclick="exportData()">⬇ بیک اپ</button>
+      <button class="btn-blue" onclick="document.getElementById('impFile').click()">⬆ بحالول</button>
+      <button class="btn-red" onclick="doLogout()">وتل</button>
+      <input type="file" id="impFile" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+  </header>
+
+  <nav>
+    <button class="active" data-p="dashboard" onclick="showPage('dashboard', this)">📊 ډشبورډ</button>
+    <button data-p="materials" onclick="showPage('materials', this)">📦 خام مواد</button>
+    <button data-p="products" onclick="showPage('products', this)">🏷️ محصولات</button>
+    <button data-p="purchases" onclick="showPage('purchases', this)">🛒 پیرود</button>
+    <button data-p="production" onclick="showPage('production', this)">⚙️ تولید</button>
+    <button data-p="sales" onclick="showPage('sales', this)">💰 پلور</button>
+    <button data-p="expenses" onclick="showPage('expenses', this)">💸 مصارف</button>
+    <button data-p="reports" onclick="showPage('reports', this)">📈 راپورونه</button>
+  </nav>
+
+  <main>
+
+    <!-- ډشبورډ -->
+    <div id="dashboard" class="page active">
+      <div class="card">
+        <h3>📊 د ټولو حسابونو لنډیز</h3>
+        <div class="grid">
+          <div class="stat"><span>ټول پلور</span><b id="dSales">0</b></div>
+          <div class="stat"><span>ټول پیرود</span><b id="dPurch">0</b></div>
+          <div class="stat"><span>ټول مصارف</span><b id="dExp">0</b></div>
+          <div class="stat"><span>تولید لګښت</span><b id="dProd">0</b></div>
+          <div class="stat green"><span>اټکلي ګټه</span><b id="dProfit">0</b></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- خام مواد -->
+    <div id="materials" class="page">
+      <div class="card"><h3>➕ نوی خام مواد</h3>
+        <form onsubmit="addSimple(event,'materials',['name','unit','qty','price'])">
+          <div class="grid">
+            <input name="name" placeholder="د موادو نوم" required>
+            <input name="unit" placeholder="واحد (kg، متر)">
+            <input name="qty" type="number" step="any" placeholder="مقدار" required>
+            <input name="price" type="number" step="any" placeholder="د واحد قیمت" required>
+            <button>ثبت</button>
+          </div>
+        </form>
+      </div>
+      <div class="card"><h3>📦 د خامو موادو لیست</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>نوم</th><th>واحد</th><th>مقدار</th><th>قیمت</th><th>ارزښت</th><th></th></tr></thead>
+          <tbody id="tb-materials"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- محصولات -->
+    <div id="products" class="page">
+      <div class="card"><h3>➕ نوی محصول</h3>
+        <form onsubmit="addSimple(event,'products',['name','unit','price'])">
+          <div class="grid">
+            <input name="name" placeholder="د محصول نوم" required>
+            <input name="unit" placeholder="واحد">
+            <input name="price" type="number" step="any" placeholder="د پلور قیمت" required>
+            <button>ثبت</button>
+          </div>
+        </form>
+      </div>
+      <div class="card"><h3>🏷️ د محصولاتو لیست</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>نوم</th><th>واحد</th><th>قیمت</th><th></th></tr></thead>
+          <tbody id="tb-products"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- پیرود -->
+    <div id="purchases" class="page">
+      <div class="card"><h3>➕ نوی پیرود</h3>
+        <form onsubmit="addPurchase(event)">
+          <div class="grid">
+            <input name="date" type="date" required>
+            <input name="supplier" placeholder="عرضه کوونکی">
+            <input name="material" placeholder="مواد" required>
+            <input name="qty" type="number" step="any" placeholder="مقدار" required>
+            <input name="price" type="number" step="any" placeholder="د واحد قیمت" required>
+            <input name="paid" type="number" step="any" placeholder="ورکړل شوې" value="0">
+            <button>ثبت</button>
+          </div>
+        </form>
+      </div>
+      <div class="card"><h3>🛒 د پیرود لیست</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>نېټه</th><th>عرضه کوونکی</th><th>مواد</th><th>مقدار</th><th>قیمت</th><th>ټول</th><th>ورکړل</th><th>پاتې</th><th></th></tr></thead>
+          <tbody id="tb-purchases"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- تولید -->
+    <div id="production" class="page">
+      <div class="card"><h3>➕ نوی تولید</h3>
+        <form onsubmit="addSimple(event,'production',['date','product','qty','cost','note'])">
+          <div class="grid">
+            <input name="date" type="date" required>
+            <input name="product" placeholder="د محصول نوم" required>
+            <input name="qty" type="number" step="any" placeholder="تولید شوی مقدار" required>
+            <input name="cost" type="number" step="any" placeholder="ټول لګښت" required>
+            <input name="note" placeholder="یادښت">
+            <button>ثبت</button>
+          </div>
+        </form>
+      </div>
+      <div class="card"><h3>⚙️ د تولید لیست</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>نېټه</th><th>محصول</th><th>مقدار</th><th>لګښت</th><th>یادښت</th><th></th></tr></thead>
+          <tbody id="tb-production"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- پلور -->
+    <div id="sales" class="page">
+      <div class="card"><h3>➕ نوی پلور</h3>
+        <form onsubmit="addSale(event)">
+          <div class="grid">
+            <input name="date" type="date" required>
+            <input name="customer" placeholder="پیریدونکی">
+            <input name="product" placeholder="محصول" required>
+            <input name="qty" type="number" step="any" placeholder="مقدار" required>
+            <input name="price" type="number" step="any" placeholder="د واحد قیمت" required>
+            <input name="paid" type="number" step="any" placeholder="ترلاسه شوې" value="0">
+            <button>ثبت</button>
+          </div>
+        </form>
+      </div>
+      <div class="card"><h3>💰 د پلور لیست</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>نېټه</th><th>پیریدونکی</th><th>محصول</th><th>مقدار</th><th>قیمت</th><th>ټول</th><th>ترلاسه</th><th>پاتې</th><th></th></tr></thead>
+          <tbody id="tb-sales"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- مصارف -->
+    <div id="expenses" class="page">
+      <div class="card"><h3>➕ نوی مصرف</h3>
+        <form onsubmit="addSimple(event,'expenses',['date','descr','amount'])">
+          <div class="grid">
+            <input name="date" type="date" required>
+            <input name="descr" placeholder="تفصیل (کرایه، بریښنا...)" required>
+            <input name="amount" type="number" step="any" placeholder="مقدار" required>
+            <button>ثبت</button>
+          </div>
+        </form>
+      </div>
+      <div class="card"><h3>💸 د مصارفو لیست</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>نېټه</th><th>تفصیل</th><th>مقدار</th><th></th></tr></thead>
+          <tbody id="tb-expenses"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- راپورونه -->
+    <div id="reports" class="page">
+      <div class="card"><h3>📈 عمومي راپور</h3><div id="reportBox"></div></div>
+    </div>
+
+    <!-- کاروونکي -->
+    <div id="users" class="page">
+      <div class="card"><h3>➕ نوی کاروونکی</h3>
+        <form onsubmit="addUser(event)">
+          <div class="grid">
+            <input name="username" placeholder="کارن نوم" required>
+            <input name="password" type="password" placeholder="پاسورډ" required>
+            <select name="role">
+              <option value="user">کاروونکی</option>
+              <option value="admin">اډمین</option>
+            </select>
+            <button>ثبت</button>
+          </div>
+        </form>
+      </div>
+      <div class="card"><h3>👥 کاروونکي</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>ID</th><th>نوم</th><th>رول</th><th></th></tr></thead>
+          <tbody id="tb-users"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ===== د ډیټا ذخیره =====
+const DB_KEY = 'factory_web_data_v1';
+let db = {
+  users: [{ id: 1, username: 'admin', password: 'admin123', role: 'admin' }],
+  materials: [], products: [], purchases: [], production: [], sales: [], expenses: [],
+  currentUser: null,
+  nextId: { materials:1, products:1, purchases:1, production:1, sales:1, expenses:1, users:2 }
+};
+
+function saveDB() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+function loadDB() {
+  const s = localStorage.getItem(DB_KEY);
+  if (s) { try { db = JSON.parse(s); } catch(e){} }
+  if (!db.nextId) db.nextId = { materials:1, products:1, purchases:1, production:1, sales:1, expenses:1, users:2 };
+  if (!db.users || !db.users.length) db.users = [{ id:1, username:'admin', password:'admin123', role:'admin' }];
+}
+function nextIdFor(t) { const id = db.nextId[t] || 1; db.nextId[t] = id + 1; return id; }
+
+// ===== ابزار =====
+function fmt(n) { return Number(n||0).toLocaleString('fa-AF', { maximumFractionDigits: 2 }); }
+function today() { return new Date().toISOString().slice(0,10); }
+function $(id) { return document.getElementById(id); }
+
+function toast(msg, isErr) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' error' : '');
+  setTimeout(() => t.className = 'toast' + (isErr ? ' error' : ''), 2200);
+}
+
+// ===== لاګین =====
+function doLogin() {
+  const u = $('lgUser').value.trim();
+  const p = $('lgPass').value;
+  const user = db.users.find(x => x.username === u && x.password === p);
+  if (!user) { $('lgErr').textContent = 'نوم یا پاسورډ غلط دی'; return; }
+  db.currentUser = { id:user.id, username:user.username, role:user.role };
+  saveDB();
+  startApp();
+}
+
+function doLogout() {
+  db.currentUser = null;
+  saveDB();
+  $('appView').style.display = 'none';
+  $('loginView').style.display = 'flex';
+  $('lgUser').value = ''; $('lgPass').value = '';
+}
+
+function startApp() {
+  $('loginView').style.display = 'none';
+  $('appView').style.display = 'block';
+  const u = db.currentUser;
+  $('currentUser').textContent = '👤 ' + u.username + (u.role === 'admin' ? ' (اډمین)' : '');
+  $('usersBtn').style.display = u.role === 'admin' ? '' : 'none';
+  setAllDates();
+  renderAll();
+  showPage('dashboard', document.querySelector('nav button[data-p=dashboard]'));
+}
+
+// ===== پاڼې =====
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = $(id);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderAll();
+}
+
+// ===== رینډر =====
+function renderAll() {
+  renderDashboard();
+  renderTable('materials');
+  renderTable('products');
+  renderTable('purchases');
+  renderTable('production');
+  renderTable('sales');
+  renderTable('expenses');
+  renderReports();
+  if (db.currentUser?.role === 'admin') renderUsers();
+}
+
+function renderDashboard() {
+  const sales = db.sales.reduce((s,x)=>s+(+x.total||0),0);
+  const purch = db.purchases.reduce((s,x)=>s+(+x.total||0),0);
+  const exp = db.expenses.reduce((s,x)=>s+(+x.amount||0),0);
+  const prod = db.production.reduce((s,x)=>s+(+x.cost||0),0);
+  const profit = sales - (prod + exp);
+  $('dSales').textContent = fmt(sales);
+  $('dPurch').textContent = fmt(purch);
+  $('dExp').textContent = fmt(exp);
+  $('dProd').textContent = fmt(prod);
+  $('dProfit').textContent = fmt(profit);
+  $('dProfit').style.color = profit >= 0 ? '#27ae60' : '#c0392b';
+}
+
+function del(name, id) {
+  return `<button class="delete-btn" onclick="removeItem('${name}',${id})">حذف</button>`;
+}
+
+function renderTable(name) {
+  const tb = $('tb-' + name);
+  if (!tb) return;
+  const rows = db[name] || [];
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="10" class="empty">هیچ ریکارډ نشته</td></tr>'; return; }
+
+  if (name === 'materials')
+    tb.innerHTML = rows.map(r=>`<tr><td>${r.name}</td><td>${r.unit||'-'}</td><td>${fmt(r.qty)}</td><td>${fmt(r.price)}</td><td>${fmt((+r.qty)*(+r.price))}</td><td>${del(name,r.id)}</td></tr>`).join('');
+  else if (name === 'products')
+    tb.innerHTML = rows.map(r=>`<tr><td>${r.name}</td><td>${r.unit||'-'}</td><td>${fmt(r.price)}</td><td>${del(name,r.id)}</td></tr>`).join('');
+  else if (name === 'purchases')
+    tb.innerHTML = rows.map(r=>`<tr><td>${r.date}</td><td>${r.supplier||'-'}</td><td>${r.material}</td><td>${fmt(r.qty)}</td><td>${fmt(r.price)}</td><td>${fmt(r.total)}</td><td>${fmt(r.paid)}</td><td style="color:#c0392b">${fmt(r.remaining)}</td><td>${del(name,r.id)}</td></tr>`).join('');
+  else if (name === 'production')
+    tb.innerHTML = rows.map(r=>`<tr><td>${r.date}</td><td>${r.product}</td><td>${fmt(r.qty)}</td><td>${fmt(r.cost)}</td><td>${r.note||'-'}</td><td>${del(name,r.id)}</td></tr>`).join('');
+  else if (name === 'sales')
+    tb.innerHTML = rows.map(r=>`<tr><td>${r.date}</td><td>${r.customer||'-'}</td><td>${r.product}</td><td>${fmt(r.qty)}</td><td>${fmt(r.price)}</td><td>${fmt(r.total)}</td><td>${fmt(r.paid)}</td><td style="color:#c0392b">${fmt(r.remaining)}</td><td>${del(name,r.id)}</td></tr>`).join('');
+  else if (name === 'expenses')
+    tb.innerHTML = rows.map(r=>`<tr><td>${r.date}</td><td>${r.descr}</td><td>${fmt(r.amount)}</td><td>${del(name,r.id)}</td></tr>`).join('');
+}
+
+function renderReports() {
+  const sales = db.sales.reduce((s,x)=>s+(+x.total||0),0);
+  const purch = db.purchases.reduce((s,x)=>s+(+x.total||0),0);
+  const exp = db.expenses.reduce((s,x)=>s+(+x.amount||0),0);
+  const prod = db.production.reduce((s,x)=>s+(+x.cost||0),0);
+  const remS = db.sales.reduce((s,x)=>s+(+x.remaining||0),0);
+  const remP = db.purchases.reduce((s,x)=>s+(+x.remaining||0),0);
+  const profit = sales - (prod + exp);
+  const box = $('reportBox');
+  if (!box) return;
+  box.innerHTML = `
+    <div class="grid" style="margin-bottom:15px">
+      <div class="stat"><span>ټول پلور</span><b>${fmt(sales)}</b></div>
+      <div class="stat"><span>ټول پیرود</span><b>${fmt(purch)}</b></div>
+      <div class="stat"><span>ټول مصارف</span><b>${fmt(exp)}</b></div>
+      <div class="stat"><span>تولید لګښت</span><b>${fmt(prod)}</b></div>
+      <div class="stat ${profit>=0?'green':'red'}"><span>اټکلي ګټه</span><b>${fmt(profit)}</b></div>
+    </div>
+    <div class="table-wrap"><table>
+      <tr><th>له پلور پاتې پیسې</th><td>${fmt(remS)}</td></tr>
+      <tr><th>له پیرود پاتې پیسې</th><td>${fmt(remP)}</td></tr>
+      <tr><th>د موادو شمېر</th><td>${db.materials.length}</td></tr>
+      <tr><th>د محصولاتو شمېر</th><td>${db.products.length}</td></tr>
+      <tr><th>د پیرود شمېر</th><td>${db.purchases.length}</td></tr>
+      <tr><th>د تولید شمېر</th><td>${db.production.length}</td></tr>
+      <tr><th>د پلور شمېر</th><td>${db.sales.length}</td></tr>
+      <tr><th>د مصارفو شمېر</th><td>${db.expenses.length}</td></tr>
+    </table></div>`;
+}
+
+// ===== CRUD =====
+function addSimple(e, name, fields) {
+  e.preventDefault();
+  const f = e.target;
+  const row = { id: nextIdFor(name) };
+  fields.forEach(k => {
+    const v = f[k].value;
+    row[k] = (k==='qty'||k==='price'||k==='cost'||k==='amount') ? +v : v;
+  });
+  db[name].push(row);
+  saveDB();
+  f.reset();
+  setAllDates();
+  renderAll();
+  toast('✅ ثبت شو');
+}
+
+function addPurchase(e) {
+  e.preventDefault();
+  const f = e.target;
+  const qty = +f.qty.value, price = +f.price.value, paid = +f.paid.value || 0;
+  const total = qty * price;
+  db.purchases.push({
+    id: nextIdFor('purchases'),
+    date: f.date.value, supplier: f.supplier.value, material: f.material.value,
+    qty, price, total, paid, remaining: total - paid
+  });
+  saveDB(); f.reset(); setAllDates(); renderAll();
+  toast('✅ پیرود ثبت شو');
+}
+
+function addSale(e) {
+  e.preventDefault();
+  const f = e.target;
+  const qty = +f.qty.value, price = +f.price.value, paid = +f.paid.value || 0;
+  const total = qty * price;
+  db.sales.push({
+    id: nextIdFor('sales'),
+    date: f.date.value, customer: f.customer.value, product: f.product.value,
+    qty, price, total, paid, remaining: total - paid
+  });
+  saveDB(); f.reset(); setAllDates(); renderAll();
+  toast('✅ پلور ثبت شو');
+}
+
+function removeItem(name, id) {
+  if (!confirm('ډاډه یې چې دا ریکارډ حذف شي؟')) return;
+  db[name] = db[name].filter(x => x.id !== id);
+  saveDB(); renderAll();
+  toast('🗑 حذف شو');
+}
+
+// ===== کاروونکي =====
+function renderUsers() {
+  const tb = $('tb-users');
+  if (!tb) return;
+  tb.innerHTML = db.users.map(u => `
+    <tr><td>${u.id}</td><td>${u.username}</td><td>${u.role}</td>
+    <td>${u.id === db.currentUser.id ? '—' : `<button class="delete-btn" onclick="removeUser(${u.id})">حذف</button>`}</td></tr>
+  `).join('');
+}
+
+function addUser(e) {
+  e.preventDefault();
+  const f = e.target;
+  const un = f.username.value.trim();
+  if (db.users.find(u => u.username === un)) { toast('دا نوم شته', true); return; }
+  db.users.push({ id: nextIdFor('users'), username: un, password: f.password.value, role: f.role.value });
+  saveDB(); f.reset(); renderUsers();
+  toast('✅ کاروونکی جوړ شو');
+}
+
+function removeUser(id) {
+  if (!confirm('ډاډه یې؟')) return;
+  db.users = db.users.filter(u => u.id !== id);
+  saveDB(); renderUsers();
+  toast('🗑 حذف شو');
+}
+
+// ===== بیک اپ =====
+function exportData() {
+  const clone = JSON.parse(JSON.stringify(db));
+  delete clone.currentUser;
+  const blob = new Blob([JSON.stringify(clone, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'factory-backup-' + today() + '.json';
+  a.click();
+  toast('⬇ بیک اپ خوندي شو');
+}
+
+function importData(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const imp = JSON.parse(r.result);
+      if (!confirm('دا به اوسنی معلومات بدل کړي. ادامه؟')) return;
+      const cur = db.currentUser;
+      db = imp;
+      db.currentUser = cur;
+      if (!db.nextId) db.nextId = { materials:1, products:1, purchases:1, production:1, sales:1, expenses:1, users:2 };
+      if (!db.users) db.users = [{id:1,username:'admin',password:'admin123',role:'admin'}];
+      saveDB(); renderAll();
+      toast('✅ بحال شو');
+    } catch(e) { toast('فایل سم نه دی', true); }
+  };
+  r.readAsText(file);
+  ev.target.value = '';
+}
+
+// ===== نېټې =====
+function setAllDates() {
+  const t = today();
+  document.querySelectorAll('input[type="date"]').forEach(i => i.value = t);
+}
+
+// ===== پیل =====
+loadDB();
+if (db.currentUser) startApp();
+$('lgPass')?.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+$('lgUser')?.addEventListener('keydown', e => { if (e.key === 'Enter') $('lgPass').focus(); });
+</script>
+</body>
+</html>
